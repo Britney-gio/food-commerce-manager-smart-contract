@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+import "FoodCommerceTypes.sol";
+
+
+library FoodCommerceLibrary {
+
+    function getPurchaseByBuyer(FoodCommerceTypes.Sale[] storage sales, address _buyer) internal view returns (FoodCommerceTypes.Sale[] memory) {
+        uint count = 0;
+        // CLICLO 1 per contare quanti acquisti ha fatto il buyer inserito
+        for (uint i = 0; i < sales.length; i++) {
+            if (sales[i].buyer == _buyer) {
+                count++;
+            }
+        }
+        // Aarray dinamico di dimensione 'count'
+        FoodCommerceTypes.Sale[] memory buyerSales = new FoodCommerceTypes.Sale[](count);
+        uint index = 0;
+
+        // CICLO 2 per copiare le vendite del buyer inserito
+        for (uint x = 0; x < sales.length; x++) {
+            if (sales[x].buyer == _buyer) {
+                buyerSales[index] = sales[x];
+                index++;
+            }
+        }
+        return buyerSales;
+    }
+
+}
