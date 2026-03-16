@@ -35,7 +35,7 @@ contract FoodCommerceManager is Ownable {
         uint totalPaid;
         uint purchaseTimestamp; 
         address buyer; 
-        //uint rating;
+        uint rating;
 
     }
 
@@ -51,6 +51,7 @@ contract FoodCommerceManager is Ownable {
         require (address(this).balance >= _amount, "Fondi insufficienti");
         _;
     }
+
 
     event Purchase ( 
         uint indexed idSale,
@@ -118,7 +119,9 @@ contract FoodCommerceManager is Ownable {
                     _amountSold,
                     payAmount,
                     purchaseTime,
-                    msg.sender                    
+                    msg.sender, 
+                    0
+
                 );
                 sales.push(newSale);
                 salesMap[newSale.idSale] = newSale;
@@ -139,7 +142,7 @@ contract FoodCommerceManager is Ownable {
     } 
 
     // Funzione per leggere info vendita inserendo Id identificativo
-    function getSale(uint _idSale) public view returns (uint, uint, string memory, uint, uint, uint, address) {
+    function getSale(uint _idSale) public view returns (uint, uint, string memory, uint, uint, uint, address, uint) {
             Sale memory selectedSale = salesMap[_idSale];
             if ( selectedSale.idSale ==0 ) {
                 revert ("Vendita inesistente");
@@ -151,8 +154,31 @@ contract FoodCommerceManager is Ownable {
                 selectedSale.amountSold,
                 selectedSale.totalPaid,
                 selectedSale.purchaseTimestamp,
-                selectedSale.buyer                    
+                selectedSale.buyer,        
+                selectedSale.rating            
                 );
             }
-    
+
+    // Funzione per valutazione acquisto
+    function rateSale(uint _idSale, uint _rating) public {
+        Sale storage selectedSale = salesMap[_idSale];
+        if (selectedSale.idSale == 0) {
+            revert("Vendita inesistente");
+        } else if (msg.sender != selectedSale.buyer) {
+            revert("Solo l'acquirente puo' valutare la vendita");
+        } else if (_rating < 1 || _rating > 5 ) {
+            revert("Valutazione non valida");
+        } else if ( selectedSale.rating != 0) {
+            revert("Vendita gia' valutata");
+        } else {
+            selectedSale.rating = _rating;
+            for ( uint i = 0; i < sales.length; i++){
+                if (sales[i].idSale == _idSale){
+                    sales[i].rating = _rating;
+                    break ;
+                }
+            }
+        }
+         
+    }
 }
