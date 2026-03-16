@@ -1,0 +1,158 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+// Logica di proprietà gestita da un contratto a parte
+contract Ownable {
+    address internal owner;
+    constructor() {
+        owner = msg.sender;
+    }
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Funzione esclusiva dell'amministratore");
+        _;
+    }
+}
+
+// Contratto derivato che eredita da Ownable 
+contract FoodCommerceManager is Ownable {
+    uint public salesSum = 0; // Variabile per il numero totale di vendite registrate 
+    Product [] products; // Array della Struct dei prodotti disponibili     
+    Sale [] sales; // Array della Srtuct con info di tutte le vendite
+    mapping ( uint => Sale ) salesMap;
+
+    struct Product { // Prodotti in vendita 
+        uint idProduct;
+        string nameProduct;
+        uint availableProduct;
+        uint priceProduct;
+    }
+
+    struct Sale { // Info di una vendita
+        uint idSale;
+        uint idProduct;
+        string nameProduct; 
+        uint amountSold;
+        uint totalPaid;
+        uint purchaseTimestamp; 
+        address buyer; 
+        //uint rating;
+
+    }
+
+    constructor() {
+        super;
+        // Prodotti presenti nell'e-commerce al deploy del contratto
+        products.push(Product(1,"Pasta ai --", 100, 0.008 ether));
+        products.push(Product(2,"Farina di --", 100, 0.008 ether));
+        products.push(Product(3,"Pane di --", 100, 0.008 ether));
+    }
+
+    modifier hasFund(uint _amount) { // verifica fondi contratto prima di autorizzare prelievo
+        require (address(this).balance >= _amount, "Fondi insufficienti");
+        _;
+    }
+
+    event Purchase ( 
+        uint indexed idSale,
+        uint indexed idProduct,
+        string nameProduct, 
+        uint amountSold,
+        uint totalPaid,
+        uint purchaseTimestamp, 
+        address indexed buyer
+        ); // evento che traccia quando nuova vendita sarà fatta
+
+    function withdraw (uint _amount) public onlyOwner hasFund(_amount) { // Funzione di prelievo riservata al proprietario del contratto 
+        payable(msg.sender).transfer(_amount);
+    } 
+
+    // Funzione per aggiungere nuovo prodotto riservata al proprietario del contratto 
+    function addProduct (uint _idProduct, string memory _nameProduct, uint _availableProduct, uint _priceProduct) public onlyOwner returns (string memory) {
+        require(_idProduct > 0, "ID non disponibile");
+        require(_availableProduct > 0, "Quantita' non valida");
+        require(_priceProduct > 0, "Prezzo non valido");
+        for (uint i = 0; i < products.length; i++)  {
+            if(_idProduct == products[i].idProduct) {
+                revert("ID gia' esistente");
+            }            
+        }
+        products.push(Product(_idProduct, _nameProduct, _availableProduct, _priceProduct));        
+        return ("Nuovo Prodotto inserito"); 
+    }  
+
+    // Funzione per leggere info prodotto inserendo Id identificativo
+    function getProduct(uint _idProduct) public view returns (uint, string memory, uint, uint) {
+            for (uint i = 0; i < products.length; i++) {
+                if (_idProduct == products[i].idProduct) {
+                    return (
+                    products[i].idProduct,
+                    products[i].nameProduct,
+                    products[i].availableProduct,
+                    products[i].priceProduct
+                    );
+                }
+            }
+             
+        revert("Prodotto inesistente");
+    }   
+
+    // Funzione per acquistare un prodotto
+    function buyProduct( uint _idProduct, uint _amountSold ) public payable {
+        for ( uint i = 0; i < products.length; i++){
+            if ( _idProduct == products[i].idProduct){
+                if (_amountSold == 0 ){
+                    revert("Quantita' non consentita");
+                }
+                if (_amountSold > products[i].availableProduct ) {
+                    revert("Quantita' non disponibile");
+                }
+                uint payAmount = products[i].priceProduct * _amountSold ;
+                require(msg.value == payAmount, "Importo errato");
+                products[i].availableProduct = products[i].availableProduct - _amountSold;
+                salesSum++;
+                uint purchaseTime = block.timestamp;
+                Sale memory newSale = Sale(
+                    salesSum,
+                    products[i].idProduct,
+                    products[i].nameProduct,
+                    _amountSold,
+                    payAmount,
+                    purchaseTime,
+                    msg.sender                    
+                );
+                sales.push(newSale);
+                salesMap[newSale.idSale] = newSale;
+
+                emit Purchase (
+                newSale.idSale,
+                newSale.idProduct,
+                newSale.nameProduct,
+                newSale.amountSold,
+                newSale.totalPaid,
+                newSale.purchaseTimestamp, 
+                newSale.buyer
+                );
+                return ;
+            }
+        }
+        revert("Prodotto inesistente");
+    } 
+
+    // Funzione per leggere info vendita inserendo Id identificativo
+    function getSale(uint _idSale) public view returns (uint, uint, string memory, uint, uint, uint, address) {
+            Sale memory selectedSale = salesMap[_idSale];
+            if ( selectedSale.idSale ==0 ) {
+                revert ("Vendita inesistente");
+            }
+            return (
+                selectedSale.idSale,
+                selectedSale.idProduct,
+                selectedSale.nameProduct,
+                selectedSale.amountSold,
+                selectedSale.totalPaid,
+                selectedSale.purchaseTimestamp,
+                selectedSale.buyer                    
+                );
+            }
+    
+}
