@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+//Creo struttura condivisa per vendite
+library FoodCommerceTypes {
+
+        struct Sale { 
+            uint idSale;
+            uint idProduct;
+            string nameProduct; 
+            uint amountSold;
+            uint totalPaid;
+            uint purchaseTimestamp; 
+            address buyer; 
+            uint rating;
+    }
+}
