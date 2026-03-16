@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: MIT
+
+}// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 import "./FoodCommerceTypes.sol";
 import "./FoodCommerceLibrary.sol";
@@ -179,4 +180,8 @@ contract FoodCommerceManager is Ownable {
         return FoodCommerceLibrary.getPurchaseByBuyer(sales, _buyer);
     }
 
+    // Uso libreria per calcolare il totale di ETH dato un certo periodo di tempo 
+    function getTotalSalesInPeriod( uint _startTimestamp, uint _endTimestamp) public view returns (uint) {
+        return FoodCommerceLibrary.getTotalSalesInPeriod(sales, _startTimestamp, _endTimestamp);
+    }
 }

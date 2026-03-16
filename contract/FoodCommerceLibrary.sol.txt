@@ -5,6 +5,7 @@ import "FoodCommerceTypes.sol";
 
 library FoodCommerceLibrary {
 
+    // Libreria per restituire struct di prodotti acquistati da un Buyer specifico
     function getPurchaseByBuyer(FoodCommerceTypes.Sale[] storage sales, address _buyer) internal view returns (FoodCommerceTypes.Sale[] memory) {
         uint count = 0;
         // CLICLO 1 per contare quanti acquisti ha fatto il buyer inserito
@@ -27,4 +28,20 @@ library FoodCommerceLibrary {
         return buyerSales;
     }
 
+
+    // Seconda libreria per calcolare il totale di ETH dato un certo periodo di tempo 
+    function getTotalSalesInPeriod(FoodCommerceTypes.Sale[] storage sales, uint _startTimestamp, uint _endTimestamp) public view returns (uint) {
+        require(_startTimestamp <= _endTimestamp,"Intervallo di tempo non valido");  
+        uint totalAmount = 0;      
+        for (uint i = 0; i < sales.length; i++) {
+            if (
+                sales[i].purchaseTimestamp >= _startTimestamp
+                 &&
+                 sales[i].purchaseTimestamp <= _endTimestamp 
+            ){
+            totalAmount += sales[i].totalPaid;
+            }
+        }
+        return totalAmount;                
+    }
 }
