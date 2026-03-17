@@ -1,5 +1,4 @@
-
-}// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 import "./FoodCommerceTypes.sol";
 import "./FoodCommerceLibrary.sol";
@@ -21,11 +20,12 @@ contract FoodCommerceManager is Ownable {
     uint public salesSum = 0; // Variabile per il numero totale di vendite registrate 
     Product [] products; // Array della Struct dei prodotti disponibili     
 
-    // uso libreria esterna per usare struct condivisa vendite :
+    // Uso libreria esterna per usare struct condivisa vendite :
     FoodCommerceTypes.Sale [] sales; 
     mapping ( uint => FoodCommerceTypes.Sale ) salesMap; 
-
-    struct Product { // Prodotti in vendita 
+    
+    // Prodotti in vendita 
+    struct Product { 
         uint idProduct;
         string nameProduct;
         uint availableProduct;
@@ -33,19 +33,13 @@ contract FoodCommerceManager is Ownable {
     }
     
     constructor() {
-        super;
         // Prodotti presenti nell'e-commerce al deploy del contratto
-        products.push(Product(1,"Pasta ai --", 100, 1 ether));
-        products.push(Product(2,"Farina di --", 100, 1 ether));
-        products.push(Product(3,"Pane di --", 100, 1 ether));
+        products.push(Product(1,"Organic Lentils", 100, 1 ether));
+        products.push(Product(2,"Whole Wheat Pasta", 100, 1 ether));
+        products.push(Product(3,"Plant Protein Mix", 100, 1 ether));
     }
 
-    modifier hasFund(uint _amount) { // verifica fondi contratto prima di autorizzare prelievo
-        require (address(this).balance >= _amount, "Fondi insufficienti");
-        _;
-    }
-
-
+    // Evento che traccia quando nuova vendita sarà fatta
     event Purchase ( 
         uint indexed idSale,
         uint indexed idProduct,
@@ -54,15 +48,23 @@ contract FoodCommerceManager is Ownable {
         uint totalPaid,
         uint purchaseTimestamp, 
         address indexed buyer
-        ); // evento che traccia quando nuova vendita sarà fatta
+        ); 
 
-    function withdraw (uint _amount) public onlyOwner hasFund(_amount) { // Funzione di prelievo riservata al proprietario del contratto 
+    // Verifica fondi contratto prima di autorizzare prelievo
+    modifier hasSufficentFund(uint _amount) { 
+        require (address(this).balance >= _amount, "Fondi insufficienti");
+        _;
+    }    
+
+    // Funzione di prelievo riservata al proprietario del contratto
+    function withdraw (uint _amount) public onlyOwner hasSufficentFund(_amount) {  
         payable(msg.sender).transfer(_amount);
     } 
 
     // Funzione per aggiungere nuovo prodotto riservata al proprietario del contratto 
     function addProduct (uint _idProduct, string memory _nameProduct, uint _availableProduct, uint _priceProduct) public onlyOwner returns (string memory) {
         require(_idProduct > 0, "ID non disponibile");
+        require(bytes(_nameProduct).length > 0, "Nome non valido");
         require(_availableProduct > 0, "Quantita' non valida");
         require(_priceProduct > 0, "Prezzo non valido");
         for (uint i = 0; i < products.length; i++)  {
@@ -88,7 +90,36 @@ contract FoodCommerceManager is Ownable {
             }
              
         revert("Prodotto inesistente");
-    }   
+    }
+
+    // Funzione per leggere info vendita inserendo Id identificativo
+    function getSale(uint _idSale) public view returns (uint, uint, string memory, uint, uint, uint, address, uint) {
+            FoodCommerceTypes.Sale memory selectedSale = salesMap[_idSale];
+            if ( selectedSale.idSale ==0 ) {
+                revert ("Vendita inesistente");
+            }
+            return (
+                selectedSale.idSale,
+                selectedSale.idProduct,
+                selectedSale.nameProduct,
+                selectedSale.amountSold,
+                selectedSale.totalPaid,
+                selectedSale.purchaseTimestamp,
+                selectedSale.buyer,        
+                selectedSale.rating            
+                );
+            }
+
+    // Uso libreria per visualizzare acquisto filtrato per buyer
+    function getPurchasesByBuyer (address _buyer) public view returns (FoodCommerceTypes.Sale[] memory) {
+        return FoodCommerceLibrary.getPurchasesByBuyer(sales, _buyer);
+    }
+
+    // Uso libreria per calcolare il totale di ETH dato un certo periodo di tempo 
+    function getTotalSalesInPeriod( uint _startTimestamp, uint _endTimestamp) public view returns (uint) {
+        return FoodCommerceLibrary.getTotalSalesInPeriod(sales, _startTimestamp, _endTimestamp);
+    }
+   
 
     // Funzione per acquistare un prodotto
     function buyProduct( uint _idProduct, uint _amountSold ) public payable {
@@ -134,23 +165,7 @@ contract FoodCommerceManager is Ownable {
         revert("Prodotto inesistente");
     } 
 
-    // Funzione per leggere info vendita inserendo Id identificativo
-    function getSale(uint _idSale) public view returns (uint, uint, string memory, uint, uint, uint, address, uint) {
-            FoodCommerceTypes.Sale memory selectedSale = salesMap[_idSale];
-            if ( selectedSale.idSale ==0 ) {
-                revert ("Vendita inesistente");
-            }
-            return (
-                selectedSale.idSale,
-                selectedSale.idProduct,
-                selectedSale.nameProduct,
-                selectedSale.amountSold,
-                selectedSale.totalPaid,
-                selectedSale.purchaseTimestamp,
-                selectedSale.buyer,        
-                selectedSale.rating            
-                );
-            }
+    
 
     // Funzione per valutazione acquisto
     function rateSale(uint _idSale, uint _rating) public {
@@ -173,15 +188,5 @@ contract FoodCommerceManager is Ownable {
             }
         }
          
-    }
-
-    // Uso libreria per visualizzare acquisto filtrato per buyer
-    function getPurchaseByBuyer (address _buyer) public view returns (FoodCommerceTypes.Sale[] memory) {
-        return FoodCommerceLibrary.getPurchaseByBuyer(sales, _buyer);
-    }
-
-    // Uso libreria per calcolare il totale di ETH dato un certo periodo di tempo 
-    function getTotalSalesInPeriod( uint _startTimestamp, uint _endTimestamp) public view returns (uint) {
-        return FoodCommerceLibrary.getTotalSalesInPeriod(sales, _startTimestamp, _endTimestamp);
     }
 }

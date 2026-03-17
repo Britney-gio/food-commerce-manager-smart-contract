@@ -1,24 +1,24 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-import "FoodCommerceTypes.sol";
+import "./FoodCommerceTypes.sol";
 
 
 library FoodCommerceLibrary {
 
-    // Libreria per restituire struct di prodotti acquistati da un Buyer specifico
-    function getPurchaseByBuyer(FoodCommerceTypes.Sale[] storage sales, address _buyer) internal view returns (FoodCommerceTypes.Sale[] memory) {
+    // Funzione per restituire vendite effettuate da un Buyer specifico
+    function getPurchasesByBuyer(FoodCommerceTypes.Sale[] storage sales, address _buyer) internal view returns (FoodCommerceTypes.Sale[] memory) {
         uint count = 0;
-        // CLICLO 1 per contare quanti acquisti ha fatto il buyer inserito
+        // CICLO 1 : conta quante vendite appartengono al buyer inserito
         for (uint i = 0; i < sales.length; i++) {
             if (sales[i].buyer == _buyer) {
                 count++;
             }
         }
-        // Aarray dinamico di dimensione 'count'
+        // Array dinamico di dimensione 'count'
         FoodCommerceTypes.Sale[] memory buyerSales = new FoodCommerceTypes.Sale[](count);
         uint index = 0;
 
-        // CICLO 2 per copiare le vendite del buyer inserito
+        // CICLO 2 : copia vendite del buyer inserito
         for (uint x = 0; x < sales.length; x++) {
             if (sales[x].buyer == _buyer) {
                 buyerSales[index] = sales[x];
@@ -29,8 +29,8 @@ library FoodCommerceLibrary {
     }
 
 
-    // Seconda libreria per calcolare il totale di ETH dato un certo periodo di tempo 
-    function getTotalSalesInPeriod(FoodCommerceTypes.Sale[] storage sales, uint _startTimestamp, uint _endTimestamp) public view returns (uint) {
+    // Funzione per calcolare il totale delle vendite in un intervallo temporale
+    function getTotalSalesInPeriod(FoodCommerceTypes.Sale[] storage sales, uint _startTimestamp, uint _endTimestamp) internal view returns (uint) {
         require(_startTimestamp <= _endTimestamp,"Intervallo di tempo non valido");  
         uint totalAmount = 0;      
         for (uint i = 0; i < sales.length; i++) {
