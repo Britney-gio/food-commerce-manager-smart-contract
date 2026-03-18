@@ -1,5 +1,4 @@
-# Start2Impact Project — Solidity Smart Contract
-# POF - Planty of Food Smart Contract
+# POF - Planty of Food Smart Contract - Start2Impact Project — Solidity Smart Contract
 
 Smart contract sviluppato per gestire l’e-commerce decentralizzato dell’azienda **POF (Planty of Food)**, una piattaforma che promuove prodotti alimentari **plant-based sostenibili provenienti da produttori italiani**.
 
@@ -139,7 +138,7 @@ La struct `Sale` contiene:
 
 ## FoodCommerceLibrary.sol
 
-Library contenente tutta la logica delle funzioni di utilità utilizzate dal contratto principale.
+Library contenente funzioni di utilità utilizzate dal contratto principale.
 
 ### getPurchaseByBuyer()
 ### getTotalSalesInPeriod()
@@ -179,7 +178,7 @@ Gli array permettono di:
 ---
 
 ### Mapping
-mapping(uint => Sale) salesMap
+`mapping(uint => Sale) salesMap`
 
 Il mapping permette di accedere rapidamente ad una vendita tramite il suo identificativo `idSale`, evitando di scorrere tutto l'array.
 
@@ -222,6 +221,9 @@ Verifica che il contratto abbia fondi sufficienti prima di permettere un preliev
 # Autore
 
 Sviluppato da **Giorgia Nieli**
+<p>
+(https://github.com/Britney-gio/food-commerce-manager-smart-contract/blob/main/gn-logo.jpg)
+</p>
 
 Email  
 giorgianieli@gmail.com
