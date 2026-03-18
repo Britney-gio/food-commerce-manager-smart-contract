@@ -19,6 +19,23 @@ Inoltre il proprietario dello smart contract deve avere la possibilità esclusiv
 
 ---
 
+## Smart Contract Deployment
+
+Il contratto è stato deployato con successo sulla rete Ethereum **Sepolia Testnet** tramite Remix IDE.
+
+**Network:** Sepolia Testnet  
+
+**Contract Address:**  
+`0x7A6EDDd49901334D0680f6985dBC2E34E1295F06`
+
+**Link Etherscan:**
+https://sepolia.etherscan.io/address/0x7A6EDDd49901334D0680f6985dBC2E34E1295F06
+
+**Transaction Hash:**  
+`0x366...aa765`
+
+---
+
 # Realizzazione del progetto
 
 Il progetto è stato sviluppato utilizzando **Solidity** tramite l'editor **Remix IDE**, dove sono stati eseguiti:
