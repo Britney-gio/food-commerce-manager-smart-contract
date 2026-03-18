@@ -1,5 +1,4 @@
-# Start2Impact Project — Solidity Smart Contract
-# POF - Planty of Food Smart Contract
+# POF - Planty of Food Smart Contract - Start2Impact Project — Solidity Smart Contract
 
 Smart contract sviluppato per gestire l’e-commerce decentralizzato dell’azienda **POF (Planty of Food)**, una piattaforma che promuove prodotti alimentari **plant-based sostenibili provenienti da produttori italiani**.
 
@@ -17,6 +16,23 @@ Inoltre il proprietario dello smart contract deve avere la possibilità esclusiv
 
 - aggiungere nuovi prodotti allo store
 - prelevare i fondi accumulati nello smart contract
+
+---
+
+## Smart Contract Deployment
+
+Il contratto è stato deployato con successo sulla rete Ethereum **Sepolia Testnet** tramite Remix IDE.
+
+**Network:** Sepolia Testnet  
+
+**Contract Address:**  
+`0x7A6EDDd49901334D0680f6985dBC2E34E1295F06`
+
+**Link Etherscan:**
+https://sepolia.etherscan.io/address/0x7A6EDDd49901334D0680f6985dBC2E34E1295F06
+
+**Transaction Hash:**  
+`0x366...aa765`
 
 ---
 
@@ -139,7 +155,7 @@ La struct `Sale` contiene:
 
 ## FoodCommerceLibrary.sol
 
-Library contenente tutta la logica delle funzioni di utilità utilizzate dal contratto principale.
+Library contenente funzioni di utilità utilizzate dal contratto principale.
 
 ### getPurchaseByBuyer()
 ### getTotalSalesInPeriod()
@@ -179,7 +195,7 @@ Gli array permettono di:
 ---
 
 ### Mapping
-mapping(uint => Sale) salesMap
+`mapping(uint => Sale) salesMap`
 
 Il mapping permette di accedere rapidamente ad una vendita tramite il suo identificativo `idSale`, evitando di scorrere tutto l'array.
 
@@ -222,10 +238,12 @@ Verifica che il contratto abbia fondi sufficienti prima di permettere un preliev
 # Autore
 
 Sviluppato da **Giorgia Nieli**
+<p>
+(https://github.com/Britney-gio/food-commerce-manager-smart-contract/blob/main/gn-logo.jpg)
+</p>
 
 Email  
 giorgianieli@gmail.com
 
 LinkedIn  
 https://www.linkedin.com/in/giorgia-nieli-98b0882b0/
-
