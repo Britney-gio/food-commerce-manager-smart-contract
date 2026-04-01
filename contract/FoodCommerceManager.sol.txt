@@ -21,8 +21,7 @@ contract FoodCommerceManager is Ownable {
     Product [] products; // Array della Struct dei prodotti disponibili     
 
     // Uso libreria esterna per usare struct condivisa vendite :
-    FoodCommerceTypes.Sale [] sales; 
-    mapping ( uint => FoodCommerceTypes.Sale ) salesMap; 
+    mapping ( uint => FoodCommerceTypes.Sale ) private salesMap; 
     
     // Prodotti in vendita 
     struct Product { 
@@ -51,14 +50,15 @@ contract FoodCommerceManager is Ownable {
         ); 
 
     // Verifica fondi contratto prima di autorizzare prelievo
-    modifier hasSufficentFund(uint _amount) { 
+    modifier hasSufficientFund(uint _amount) { 
         require (address(this).balance >= _amount, "Fondi insufficienti");
         _;
     }    
 
     // Funzione di prelievo riservata al proprietario del contratto
-    function withdraw (uint _amount) public onlyOwner hasSufficentFund(_amount) {  
-        payable(msg.sender).transfer(_amount);
+    function withdraw (uint _amount) public onlyOwner hasSufficientFund(_amount) {  
+        (bool success, ) = payable(msg.sender).call{value: _amount}("");
+        require(success, "Trasferimento fallito");
     } 
 
     // Funzione per aggiungere nuovo prodotto riservata al proprietario del contratto 
@@ -94,7 +94,7 @@ contract FoodCommerceManager is Ownable {
 
     // Funzione per leggere info vendita inserendo Id identificativo
     function getSale(uint _idSale) public view returns (uint, uint, string memory, uint, uint, uint, address, uint) {
-            FoodCommerceTypes.Sale memory selectedSale = salesMap[_idSale];
+        FoodCommerceTypes.Sale memory selectedSale = salesMap[_idSale];
             if ( selectedSale.idSale ==0 ) {
                 revert ("Vendita inesistente");
             }
@@ -107,17 +107,17 @@ contract FoodCommerceManager is Ownable {
                 selectedSale.purchaseTimestamp,
                 selectedSale.buyer,        
                 selectedSale.rating            
-                );
-            }
+            );
+    }
 
     // Uso libreria per visualizzare acquisto filtrato per buyer
-    function getPurchasesByBuyer (address _buyer) public view returns (FoodCommerceTypes.Sale[] memory) {
-        return FoodCommerceLibrary.getPurchasesByBuyer(sales, _buyer);
+    function getPurchasesByBuyer(address _buyer) public view returns (FoodCommerceTypes.Sale[] memory) {
+        return FoodCommerceLibrary.getPurchasesByBuyer(salesMap, salesSum, _buyer);
     }
 
     // Uso libreria per calcolare il totale di ETH dato un certo periodo di tempo 
-    function getTotalSalesInPeriod( uint _startTimestamp, uint _endTimestamp) public view returns (uint) {
-        return FoodCommerceLibrary.getTotalSalesInPeriod(sales, _startTimestamp, _endTimestamp);
+    function getTotalSalesInPeriod(uint _startTimestamp, uint _endTimestamp) public view returns (uint) {
+        return FoodCommerceLibrary.getTotalSalesInPeriod(salesMap, salesSum, _startTimestamp, _endTimestamp);
     }
    
 
@@ -145,9 +145,7 @@ contract FoodCommerceManager is Ownable {
                     purchaseTime,
                     msg.sender, 
                     0
-
                 );
-                sales.push(newSale);
                 salesMap[newSale.idSale] = newSale;
 
                 emit Purchase (
@@ -163,9 +161,7 @@ contract FoodCommerceManager is Ownable {
             }
         }
         revert("Prodotto inesistente");
-    } 
-
-    
+    }     
 
     // Funzione per valutazione acquisto
     function rateSale(uint _idSale, uint _rating) public {
@@ -180,13 +176,6 @@ contract FoodCommerceManager is Ownable {
             revert("Vendita gia' valutata");
         } else {
             selectedSale.rating = _rating;
-            for ( uint i = 0; i < sales.length; i++){
-                if (sales[i].idSale == _idSale){
-                    sales[i].rating = _rating;
-                    break ;
-                }
-            }
-        }
-         
+        }         
     }
 }

@@ -4,44 +4,49 @@ import "./FoodCommerceTypes.sol";
 
 
 library FoodCommerceLibrary {
-
     // Funzione per restituire vendite effettuate da un Buyer specifico
-    function getPurchasesByBuyer(FoodCommerceTypes.Sale[] storage sales, address _buyer) internal view returns (FoodCommerceTypes.Sale[] memory) {
+    function getPurchasesByBuyer(
+        mapping(uint => FoodCommerceTypes.Sale) storage salesMap,
+        uint salesSum,
+        address _buyer
+    ) internal view returns (FoodCommerceTypes.Sale[] memory) {
         uint count = 0;
         // CICLO 1 : conta quante vendite appartengono al buyer inserito
-        for (uint i = 0; i < sales.length; i++) {
-            if (sales[i].buyer == _buyer) {
+         for (uint i = 1; i <= salesSum; i++) {
+            if (salesMap[i].buyer == _buyer) {
                 count++;
             }
         }
         // Array dinamico di dimensione 'count'
         FoodCommerceTypes.Sale[] memory buyerSales = new FoodCommerceTypes.Sale[](count);
         uint index = 0;
-
         // CICLO 2 : copia vendite del buyer inserito
-        for (uint x = 0; x < sales.length; x++) {
-            if (sales[x].buyer == _buyer) {
-                buyerSales[index] = sales[x];
+        for (uint i = 1; i <= salesSum; i++) {
+            if (salesMap[i].buyer == _buyer) {
+                buyerSales[index] = salesMap[i];
                 index++;
             }
         }
         return buyerSales;
     }
 
-
     // Funzione per calcolare il totale delle vendite in un intervallo temporale
-    function getTotalSalesInPeriod(FoodCommerceTypes.Sale[] storage sales, uint _startTimestamp, uint _endTimestamp) internal view returns (uint) {
-        require(_startTimestamp <= _endTimestamp,"Intervallo di tempo non valido");  
-        uint totalAmount = 0;      
-        for (uint i = 0; i < sales.length; i++) {
+    function getTotalSalesInPeriod(
+        mapping(uint => FoodCommerceTypes.Sale) storage salesMap,
+        uint salesSum,
+        uint _startTimestamp,
+        uint _endTimestamp
+        ) internal view returns (uint) {
+        require(_startTimestamp <= _endTimestamp, "Intervallo di tempo non valido");
+        uint totalAmount = 0;
+        for (uint i = 1; i <= salesSum; i++) {
             if (
-                sales[i].purchaseTimestamp >= _startTimestamp
-                 &&
-                 sales[i].purchaseTimestamp <= _endTimestamp 
-            ){
-            totalAmount += sales[i].totalPaid;
+                salesMap[i].purchaseTimestamp >= _startTimestamp &&
+                salesMap[i].purchaseTimestamp <= _endTimestamp
+            ) {
+                totalAmount += salesMap[i].totalPaid;
             }
         }
-        return totalAmount;                
+        return totalAmount;
     }
 }
