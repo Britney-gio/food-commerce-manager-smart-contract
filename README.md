@@ -23,7 +23,7 @@ L’obiettivo del progetto è simulare un sistema di vendita completo on-chain, 
 
 ---
 
-## 🔗 Deploy
+## Deploy
 
 **Network:** Sepolia Testnet
 
@@ -42,7 +42,7 @@ https://sepolia.etherscan.io/address/0xe7e78586E33C4F02c749324238B1163BC61bBAc0
 
 Il progetto è suddiviso in tre file principali:
 
-### FoodCommerceManager.sol.txt
+### FoodCommerceManager.sol
 
 Contiene la logica principale dello smart contract.
 
@@ -56,7 +56,7 @@ Include:
 
 ---
 
-### FoodCommerceTypes.sol.txt
+### FoodCommerceTypes.sol
 
 Contiene la struct condivisa:
 
@@ -66,7 +66,7 @@ Serve a migliorare modularità e riutilizzo del codice.
 
 ---
 
-### FoodCommerceLibrary.sol.txt
+### FoodCommerceLibrary.sol
 
 Contiene funzioni di supporto:
 
