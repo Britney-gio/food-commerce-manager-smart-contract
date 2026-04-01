@@ -1,250 +1,122 @@
-# POF - Planty of Food Smart Contract - Start2Impact Project — Solidity Smart Contract
+# POF - Planty of Food Smart Contract
 
-Smart contract sviluppato per gestire l’e-commerce decentralizzato dell’azienda **POF (Planty of Food)**, una piattaforma che promuove prodotti alimentari **plant-based sostenibili provenienti da produttori italiani**.
+Smart contract sviluppato in **Solidity** per gestire un e-commerce decentralizzato di prodotti alimentari **plant-based sostenibili**, provenienti da produttori italiani.
 
-L'obiettivo del progetto è sviluppare uno smart contract che possa interagire con l’e-commerce dell’azienda e gestire l’intero processo di vendita.
-
-Il cliente ha richiesto che lo smart contract permetta di:
-
-- acquistare prodotti
-- registrare automaticamente le vendite
-- inviare recensioni dopo l’acquisto
-- analizzare e tracciare il numero di vendite
-- consultare lo storico degli acquisti per cliente
-
-Inoltre il proprietario dello smart contract deve avere la possibilità esclusiva di:
-
-- aggiungere nuovi prodotti allo store
-- prelevare i fondi accumulati nello smart contract
+L’obiettivo del progetto è simulare un sistema di vendita completo on-chain, gestendo acquisti, vendite e analisi dati direttamente su blockchain.
 
 ---
 
-## Smart Contract Deployment
+## Funzionalità principali
 
-Il contratto è stato deployato con successo sulla rete Ethereum **Sepolia Testnet** tramite Remix IDE.
+### Per gli utenti
 
-**Network:** Sepolia Testnet  
+- Acquisto prodotti in ETH
+- Registrazione automatica delle vendite
+- Possibilità di lasciare recensioni
+- Consultazione storico acquisti
+- Analisi vendite per periodo
+
+### Per l’amministratore
+
+- Aggiunta nuovi prodotti
+- Prelievo fondi dal contratto
+
+---
+
+## 🔗 Deploy
+
+**Network:** Sepolia Testnet
 
 **Contract Address:**  
-`0x7A6EDDd49901334D0680f6985dBC2E34E1295F06`
+`0xe7e78586E33C4F02c749324238B1163BC61bBAc0`
 
-**Link Etherscan:**
-https://sepolia.etherscan.io/address/0x7A6EDDd49901334D0680f6985dBC2E34E1295F06
+**Hash Transazione:**
+0xea26df11a124092a6c7eeeb0b7179c762212044e732f43e86c4a6b8a228a2a10
 
-**Transaction Hash:**  
-`0x366...aa765`
-
----
-
-# Realizzazione del progetto
-
-Il progetto è stato sviluppato utilizzando **Solidity** tramite l'editor **Remix IDE**, dove sono stati eseguiti:
-
-- scrittura del codice
-- compilazione
-- test
-- debug
-- deploy su testnet
+**Etherscan:**  
+https://sepolia.etherscan.io/address/0xe7e78586E33C4F02c749324238B1163BC61bBAc0
 
 ---
 
-# Architettura del progetto
+## Architettura
 
-Il progetto è suddiviso in **tre file principali**.
+Il progetto è suddiviso in tre file principali:
 
----
+### FoodCommerceManager.sol.txt
 
-## FoodCommerceManager.sol
+Contiene la logica principale dello smart contract.
 
-Questo file contiene due contratti:
+Include:
 
-### Ownable
-
-Contratto che gestisce la **logica di proprietà** dello smart contract.  
-Al momento del deploy viene registrato automaticamente l'indirizzo dell'amministratore.
-
-Questo consente di limitare alcune funzioni solo al proprietario del contratto.
-
----
-
-### FoodCommerceManager
-
-Contratto principale che implementa tutta la logica dell’e-commerce.
-
-Il contratto è organizzato in tre sezioni principali seguendo un ordine preciso.
-
----
-
-### 1. Funzioni amministrative (solo owner)
-
-**withdraw()**
-
-Permette all'amministratore di prelevare i fondi presenti nello smart contract, dopo aver verificato che il saldo sia sufficiente.
-
-**addProduct()**
-
-Permette all'amministratore di aggiungere nuovi prodotti allo store, effettuando controlli sui dati inseriti e salvandoli nell'array dei prodotti.
-
----
-
-### 2. Funzioni di lettura
-
-**getProduct()**
-
-Permette a qualsiasi utente di ottenere le informazioni di un prodotto tramite il suo identificativo `idProduct`.
-
-**getSale()**
-
-Restituisce le informazioni di una vendita tramite `idSale`.
-
-**getPurchasesByBuyer()**
-
-Permette di recuperare tutte le vendite effettuate da uno specifico indirizzo Ethereum.
-
-**getTotalSalesInPeriod()**
-
-Calcola il totale degli ETH incassati dal contratto in un determinato intervallo temporale.
-
----
-
-### 3. Funzioni core del progetto
-
-**buyProduct()**
-
-Permette ad un utente di acquistare uno o più prodotti inviando ETH.  
-La funzione esegue diversi controlli e registra la vendita nello smart contract.
-
-Durante l'acquisto viene inoltre emesso l'evento `Purchase`.
-
-**rateSale()**
-
-Permette al buyer che ha effettuato l'acquisto di lasciare una valutazione dell'esperienza.
-
-Una vendita può essere valutata **una sola volta** e solo dal buyer che l'ha effettuata.
-
----
-
-Le funzioni insieme permettono la gestione completa di:
-
-- prodotti
+- gestione prodotti
+- gestione vendite
 - acquisti
-- pagamenti
-- recensioni
-- analisi delle vendite
+- sistema di rating
+- controllo amministratore (Ownable)
 
 ---
 
-## FoodCommerceTypes.sol
+### FoodCommerceTypes.sol.txt
 
-Library che contiene la **struct condivisa `Sale`**.
+Contiene la struct condivisa:
 
-Questa scelta è stata adottata per evitare duplicazione di codice tra contratti e migliorare la modularità del progetto.
+- `Sale`
 
-La struct `Sale` contiene:
-
-- idSale
-- idProduct
-- nameProduct
-- amountSold
-- totalPaid
-- purchaseTimestamp
-- buyer
-- rating
+Serve a migliorare modularità e riutilizzo del codice.
 
 ---
 
-## FoodCommerceLibrary.sol
+### FoodCommerceLibrary.sol.txt
 
-Library contenente funzioni di utilità utilizzate dal contratto principale.
+Contiene funzioni di supporto:
 
-### getPurchaseByBuyer()
-### getTotalSalesInPeriod()
+- `getPurchasesByBuyer()`
+- `getTotalSalesInPeriod()`
 
----
-
-# Scelte tecniche
-
-## Uso delle struct
-
-Le struct sono utilizzate per rappresentare dati complessi.
-
-Nel progetto sono utilizzate per memorizzare:
-
-- prodotti
-- vendite
-
-Questo permette di raggruppare più informazioni correlate in una singola struttura.
+Utilizzata per filtrare e analizzare i dati delle vendite.
 
 ---
 
-## Uso di array e mapping
+## Tecnologie utilizzate
 
-Nel progetto vengono utilizzate entrambe le strutture dati.
-
-### Array
-- Product[] products
-- Sale[] sales
-
-
-Gli array permettono di:
-
-- iterare sugli elementi
-- effettuare controlli sui dati
-- gestire liste dinamiche
+- Solidity ^0.8.x
+- Remix IDE
+- MetaMask
+- Sepolia Testnet
 
 ---
 
-### Mapping
-`mapping(uint => Sale) salesMap`
+## Flusso del sistema
 
-Il mapping permette di accedere rapidamente ad una vendita tramite il suo identificativo `idSale`, evitando di scorrere tutto l'array.
-
-L'utilizzo combinato di **array + mapping** permette di ottenere sia:
-
-- iterazione efficiente
-- accesso diretto ai dati
-
----
-
-## Eventi
-
-Il progetto utilizza l'evento:
-
-**Purchase**
-
-Questo evento viene emesso ogni volta che viene effettuato un acquisto.
-
-Gli eventi permettono di:
-
-- tracciare le operazioni on-chain
-- integrare facilmente il contratto con frontend o servizi off-chain.
+1. L’amministratore aggiunge prodotti
+2. L’utente acquista inviando ETH
+3. Il contratto registra la vendita (`salesMap`)
+4. Viene emesso un evento `Purchase`
+5. L’utente può lasciare una recensione
+6. I dati possono essere analizzati tramite funzioni dedicate
 
 ---
 
-## Modifier
+## Miglioramenti apportati
 
-Sono stati utilizzati modifier per migliorare la sicurezza del contratto.
+- Sostituito `.transfer` con `.call` per maggiore sicurezza
+- Eliminata duplicazione dati tra array e mapping
+- `salesMap` utilizzato come unica fonte di verità
 
-**onlyOwner()**
+---
 
-Limita alcune funzioni all'amministratore dello smart contract.
+## Note
 
-**hasSufficientFunds()**
-
-Verifica che il contratto abbia fondi sufficienti prima di permettere un prelievo.
+Progetto sviluppato durante il percorso **Blockchain Development** con Start2Impact.
 
 ---
 
 # Autore
 
 Sviluppato da **Giorgia Nieli**
-<p>
-(https://github.com/Britney-gio/food-commerce-manager-smart-contract/blob/main/gn-logo.jpg)
-</p>
 
 Email  
 giorgianieli@gmail.com
 
 LinkedIn  
 https://www.linkedin.com/in/giorgia-nieli-98b0882b0/
-
